@@ -12,65 +12,134 @@
 		<table border=1 align="center">
 			<tbody>
 				<tr>
-					<td id="cell1" class="cell" onclick="onClickCell('cell1', 0, 0)"><img src="imgs/empty.png" /></td>
-					<td id="cell2" class="cell" onclick="onClickCell('cell2', 0, 1)"><img src="imgs/empty.png" /></td>
-					<td id="cell3" class="cell" onclick="onClickCell('cell3', 0, 2)"><img src="imgs/empty.png" /></td>
+					<td class="cell" onclick="myGame.onClickCell(this, 0, 0)"><img src="imgs/empty.png" /></td>
+					<td class="cell" onclick="myGame.onClickCell(this, 0, 1)"><img src="imgs/empty.png" /></td>
+					<td class="cell" onclick="myGame.onClickCell(this, 0, 2)"><img src="imgs/empty.png" /></td>
 				</tr>
 				<tr>
-					<td id="cell4" class="cell" onclick="onClickCell('cell4', 1, 0)"><img src="imgs/empty.png" /></td>
-					<td id="cell5" class="cell" onclick="onClickCell('cell5', 1, 1)"><img src="imgs/empty.png" /></td>
-					<td id="cell6" class="cell" onclick="onClickCell('cell6', 1, 2)"><img src="imgs/empty.png" /></td>
+					<td class="cell" onclick="myGame.onClickCell(this, 1, 0)"><img src="imgs/empty.png" /></td>
+					<td class="cell" onclick="myGame.onClickCell(this, 1, 1)"><img src="imgs/empty.png" /></td>
+					<td class="cell" onclick="myGame.onClickCell(this, 1, 2)"><img src="imgs/empty.png" /></td>
 				</tr>
 				<tr>
-					<td id="cell7" class="cell" onclick="onClickCell('cell7', 2, 0)"><img src="imgs/empty.png" /></td>
-					<td id="cell8" class="cell" onclick="onClickCell('cell8', 2, 1)"><img src="imgs/empty.png" /></td>
-					<td id="cell9" class="cell" onclick="onClickCell('cell9', 2, 2)"><img src="imgs/empty.png" /></td>
+					<td class="cell" onclick="myGame.onClickCell(this, 2, 0)"><img src="imgs/empty.png" /></td>
+					<td class="cell" onclick="myGame.onClickCell(this, 2, 1)"><img src="imgs/empty.png" /></td>
+					<td class="cell" onclick="myGame.onClickCell(this, 2, 2)"><img src="imgs/empty.png" /></td>
 				</tr>
 			</tbody>
 		</table>
-		<input type="button" value="Reset" onclick="initialize()" />
+		<input type="button" value="Reset" onclick="myGame.init()" />
 	</div>
 	
 	
 	<script language="javascript">
-		var currentPlayer = 1;	//Can get 1 or 2 value
-		//Values inside the matrix.
-		// . means empty
-		// o means player 1
-		// x means player 2
-		var matrix = [['.', '.', '.'], ['.', '.', '.'], ['.', '.', '.']];
-		//Changes the value inside the matrix according to the rules
-		function onClickCell(id, row, column) {
-			if(matrix[row][column] == '.') {
-				matrix[row][column] = currentPlayer === 1 ? 'o' : 'x';
-				var cell = document.getElementById(id).childNodes[0];
-				if(currentPlayer === 1) {
-					cell.src = "imgs/o.png";
-				} else {
-					cell.src = "imgs/x.png";
-				}	
-				//Change player
-				currentPlayer = currentPlayer % 2 + 1;
+		function Game () {
+			this.currentPlayer = 1;	//Can get 1 or 2 value
+			//Values inside the matrix.
+			// . means empty
+			// o means player 1
+			// x means player 2
+			this.matrix = [['.', '.', '.'], ['.', '.', '.'], ['.', '.', '.']];
+			//View showing current player
+			this.playerView = document.getElementById("player");
+			this.showCurrentPlayer = function(){
+				this.playerView.textContent = "Current Player: " + this.currentPlayer;
 			}
-			showCurrentPlayer();
 		}
-		function showCurrentPlayer(){
-			//View where to write the current player
-			var playerView = document.getElementById("player");
-			console.log(playerView);
-			playerView.textContent = "Current Player: " + currentPlayer;
-			console.log(playerView.textContent);
+			//Changes the value inside the matrix according to the rules
+		Game.prototype.onClickCell = function (view, row, column) {
+				if(this.matrix[row][column] == '.') {
+					this.matrix[row][column] = this.currentPlayer === 1 ? 'o' : 'x';
+					var cell = view.childNodes[0];
+					if(this.currentPlayer === 1) {
+						cell.src = "imgs/o.png";
+					} else {
+						cell.src = "imgs/x.png";
+					}	
+					if(this.checkWin(this.currentPlayer, row, column)){
+						this.showWinning(this.currentPlayer);
+					} else {
+						//Change player
+						this.currentPlayer = this.currentPlayer % 2 + 1;
+					}
+				}
+				this.showCurrentPlayer();
+			}
+	Game.prototype.init = function () {
+		this.matrix = [['.', '.', '.'], ['.', '.', '.'], ['.', '.', '.']];
+		tbody = document.getElementsByTagName('tbody')[0];
+		for(var i = 0; i < tbody.childNodes.length; i++) {
+			tds = tbody.childNodes[i].childNodes;
+			for(var j = 1; j < tds.length; j+=2){
+				tds[j].childNodes[0].src = "imgs/empty.png";
+			}
 		}
-		function initialize() {
-			matrix = [['.', '.', '.'], ['.', '.', '.'], ['.', '.', '.']];
-			tbody = document.getElementsByTagName('tbody')[0];
-			for(var i = 0; i < tbody.childNodes.length; i++) {
-				tds = tbody.childNodes[i].childNodes;
-				for(var j = 1; j < tds.length; j+=2){
-					console.log(tds[j]);
-					tds[j].childNodes[0].src = "imgs/empty.png";
+		this.currentPlayer = 1;
+		this.showCurrentPlayer();
+	};
+	Game.prototype.checkWin = function(player, row, col) {
+		var matrix = this.matrix;
+		var getValue = function(row, col){
+			switch(matrix[row][col]){
+				case '.':
+					return 0;
+				case 'o':
+					return 1;
+				case 'x':
+					return -1;
+			}
+		};
+		var isWin = function(score){
+			if((player === 1) && (score === 2)){
+				return true;
+			} else if(player === 2 && score === -2) {
+				return true;
+			} else {
+				return false;
+			}
+		};
+		var checkRows = function(row, col){
+			if(col === 0){
+				return isWin(getValue(row, col+1) + getValue(row, col+2));
+			} else if(col === 2){
+				return isWin(getValue(row, col-1) + getValue(row, col-2));
+			} else {
+				return isWin(getValue(row, col-1) + getValue(row, col+1));
+			}
+		};
+		var checkCols = function(row, col){
+			if(row === 0){
+				return isWin(getValue(row+1, col) + getValue(row+2, col));
+			} else if(row === 2){
+				return isWin(getValue(row-1, col) + getValue(row-2, col));
+			} else {
+				return isWin(getValue(row-1, col) + getValue(row+1, col));
+			}
+		};
+		var checkDiags = function(row, col){
+			if(row === 1 && col === 1){
+				return (isWin(getValue(row-1, col-1) + getValue(row+1, col+1))
+					|| isWin(getValue(row-1, col+1) + getValue(row+1, col-1)));
+			} else if(row === 0){
+				if(col === 0){
+					return isWin(getValue(row+1, col+1) + getValue(row+2, col+2));
+				} else if(col === 2) {
+					return isWin(getValue(row+1, col-1) + getValue(row+2, col-2));
+				}
+			} else if(row === 2){
+				if(col === 0){
+					return isWin(getValue(row-1, col+1) + getValue(row-2, col+2));
+				} else if(col === 2) {
+					return isWin(getValue(row-1, col-1) + getValue(row-2, col-2));
 				}
 			}
-		}
+		};
+		return (checkRows(row, col) || checkCols(row, col) || checkDiags(row, col));
+	};
+	Game.prototype.showWinning = function(player){
+		alert("Player " + player + " won!");
+		this.init();
+	};	
+	var myGame = new Game();
 	</script>
 </body>
