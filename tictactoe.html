@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<title>Tic Tac Toe!</title>
+	<link href="style.css" type="text/css" rel="stylesheet">
+</html>
+
+<body>
+	<h1 style="color: grey; font-family: Verdana; text-align: center">Tic Tac Toe</h1>
+	<h2 id="player" style="color: grey; font-family: Verdana; text-align: right">Current Player: 1</h2> 
+
+	<div id="game">
+		<table border=1 align="center">
+			<tbody>
+				<tr>
+					<td id="cell1" class="cell" onclick="onClickCell('cell1', 0, 0)"><img src="imgs/empty.png" /></td>
+					<td id="cell2" class="cell" onclick="onClickCell('cell2', 0, 1)"><img src="imgs/empty.png" /></td>
+					<td id="cell3" class="cell" onclick="onClickCell('cell3', 0, 2)"><img src="imgs/empty.png" /></td>
+				</tr>
+				<tr>
+					<td id="cell4" class="cell" onclick="onClickCell('cell4', 1, 0)"><img src="imgs/empty.png" /></td>
+					<td id="cell5" class="cell" onclick="onClickCell('cell5', 1, 1)"><img src="imgs/empty.png" /></td>
+					<td id="cell6" class="cell" onclick="onClickCell('cell6', 1, 2)"><img src="imgs/empty.png" /></td>
+				</tr>
+				<tr>
+					<td id="cell7" class="cell" onclick="onClickCell('cell7', 2, 0)"><img src="imgs/empty.png" /></td>
+					<td id="cell8" class="cell" onclick="onClickCell('cell8', 2, 1)"><img src="imgs/empty.png" /></td>
+					<td id="cell9" class="cell" onclick="onClickCell('cell9', 2, 2)"><img src="imgs/empty.png" /></td>
+				</tr>
+			</tbody>
+		</table>
+		<input type="button" value="Reset" onclick="initialize()" />
+	</div>
+	
+	
+	<script language="javascript">
+		var currentPlayer = 1;	//Can get 1 or 2 value
+		//Values inside the matrix.
+		// . means empty
+		// o means player 1
+		// x means player 2
+		var matrix = [['.', '.', '.'], ['.', '.', '.'], ['.', '.', '.']];
+		//Changes the value inside the matrix according to the rules
+		function onClickCell(id, row, column) {
+			if(matrix[row][column] == '.') {
+				matrix[row][column] = currentPlayer === 1 ? 'o' : 'x';
+				var cell = document.getElementById(id).childNodes[0];
+				if(currentPlayer === 1) {
+					cell.src = "imgs/o.png";
+				} else {
+					cell.src = "imgs/x.png";
+				}	
+				//Change player
+				currentPlayer = currentPlayer % 2 + 1;
+			}
+			showCurrentPlayer();
+		}
+		function showCurrentPlayer(){
+			//View where to write the current player
+			var playerView = document.getElementById("player");
+			console.log(playerView);
+			playerView.textContent = "Current Player: " + currentPlayer;
+			console.log(playerView.textContent);
+		}
+		function initialize() {
+			matrix = [['.', '.', '.'], ['.', '.', '.'], ['.', '.', '.']];
+			tbody = document.getElementsByTagName('tbody')[0];
+			for(var i = 0; i < tbody.childNodes.length; i++) {
+				tds = tbody.childNodes[i].childNodes;
+				for(var j = 1; j < tds.length; j+=2){
+					console.log(tds[j]);
+					tds[j].childNodes[0].src = "imgs/empty.png";
+				}
+			}
+		}
+	</script>
+</body>
